@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <title>Yksinkertainen matopeli</title>
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #menu, #gameOverScreen {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        button {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #ccc;
+        }
+
+        #score {
+            margin-top: 10px;
+        }
+
+        canvas {
+            border: 2px solid #fff;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Matopeli</h1>
+
+    <div id="menu">
+        <p>Paina nappia aloittaaksesi pelin.</p>
+        <button id="startButton">Aloita peli</button>
+    </div>
+
+    <div id="score" style="display:none;">
+        Pisteet: <span id="scoreValue">0</span> / 150
+    </div>
+
+    <canvas id="gameCanvas" width="150" height="150" style="display:none;"></canvas>
+
+    <div id="winScreen" style="display:none;">
+        <p id="winText">Voitit!</p>
+        <button id="restartButtonWin">Aloita uusi peli</button>
+    </div>
+    <div id="gameOverScreen" style="display:none;">
+        <p id="gameOverText">Game Over</p>
+        <button id="restartButton">Aloita uusi peli</button>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
