@@ -1,0 +1,73 @@
+    /* Tyylit, asettelut yms html-elementeille */
+        
+        /* Yleiset tyylit */
+        body {
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Vasen puoli */
+        #leftSide {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-right: 40px;
+        }
+
+        /* Pelin valikko ja pelin lopetusnäyttö */
+        #menu, #gameOverScreen {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* Nappien tyylit */
+        button {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Nappien hover-effekti */
+        button:hover {
+            background: #ccc;
+        }
+
+        /* Pisteiden näyttö */
+        #score {
+            margin-top: 10px;
+        }
+
+        canvas {
+            border: 2px solid #fff;
+            margin-top: 20px;
+        }
+
+        /* Peliohjeet */
+        #instructions {
+            width: 200px;
+            border-left: 2px solid #fff;
+            padding: 20px;
+            margin-left: 20px;
+            height: 100vh;
+        }
+
+        #instructions h2 {
+            margin-top: 0;
+            font-size: 20px;
+        }
+
+        #instructions p {
+            font-size: 14px;
+            line-height: 1.4;
+        }
