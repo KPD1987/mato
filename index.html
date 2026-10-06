@@ -2,45 +2,158 @@
 <html lang="fi">
 <head>
     <meta charset="UTF-8">
-    <title>Yksinkertainen matopeli</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Matopeli</title>
+
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        #levelDisplay {
+            margin: 16px 0;
+        }
+
+        #levelInfo {
+            font-weight: bold;
+        }
+
+        #progressInfo {
+            max-width: 520px;
+            line-height: 1.5;
+        }
+
+        #gameCanvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            background: #17202b;
+            border: 2px solid #526176;
+        }
+
+        #score {
+            margin: 12px 0;
+            font-weight: bold;
+        }
+
+        button {
+            cursor: pointer;
+        }
+    </style>
 </head>
+
 <body>
     <div id="leftSide">
         <h1>Matopeli</h1>
 
+        <!-- Nykyinen taso ja eteneminen -->
+        <div id="levelDisplay">
+            <p id="levelInfo"></p>
+            <p id="progressInfo"></p>
+        </div>
+
+        <!-- Aloitusvalikko -->
         <div id="menu">
-            <p>Paina nappia aloittaaksesi pelin.</p>
-            <button id="startButton">Aloita peli</button>
+            <p>
+                Aloita peli ja lähde liikkeelle nuolinäppäimellä.
+            </p>
+
+            <button id="startButton" type="button">
+                Aloita peli
+            </button>
         </div>
 
-        <div id="score" style="display:none;">
-            Pisteet: <span id="scoreValue">0</span> / 1250
+        <!-- Pisteet -->
+        <div id="score" style="display: none;">
+            Pisteet: <span id="scoreValue">0</span>
         </div>
 
-        <canvas id="gameCanvas" width="360" height="360" style="display:none;"></canvas>
+        <!-- Pelikenttä -->
+        <canvas
+            id="gameCanvas"
+            width="240"
+            height="240"
+        ></canvas>
 
-        <div id="gameOverScreen" style="display:none;">
+        <!-- Pelin lopetusnäyttö -->
+        <div id="gameOverScreen" style="display: none;">
             <p id="gameOverText">Game Over</p>
-            <button id="restartButton">Aloita uusi peli</button>
+
+            <button id="restartButton" type="button">
+                Aloita uusi peli
+            </button>
         </div>
     </div>
 
-    <!-- OHJEET -->
+    <!-- Ohjeet -->
     <div id="instructions">
-        <h2>Ohjeet tulevat alle tämän tyylisesti:</h2>
-        <p>Voit aloittaa pelin painamalla "Aloita peli" -nappia tai Enter-näppäintä.</p>
-        <p>Ohjaa matoa nuolinäppäimillä:</p>
-        <p>⬆️ Ylös<br>⬇️ Alas<br>⬅️ Vasemmalle<br>➡️ Oikealle</p>
-        <p>Mato kasvaa joka 10 hedelmän jälkeen ja nopeutuu 50 pisteen välein.</p>
+        <h2>Ohjeet</h2>
 
-        <p>Syö hedelmiä saadaksesi pisteitä (+10).</p>
-        <p>Vältä törmäämästä seiniin tai omaan kehoon.</p>
-        <p>Tavoite: XXXX pistettä.</p>
+        <p>
+            Aloita peli painamalla "Aloita peli" -nappia
+            tai Enter-näppäintä.
+        </p>
+
+        <p>
+            Mato lähtee liikkeelle ensimmäisestä
+            sallitusta nuolinäppäimen painalluksesta.
+        </p>
+
+        <p>Ohjaa matoa nuolinäppäimillä:</p>
+
+        <p>
+            ⬆️ Ylös<br>
+            ⬇️ Alas<br>
+            ⬅️ Vasemmalle<br>
+            ➡️ Oikealle
+        </p>
+
+        <p>
+            Yhdestä hedelmästä saat 10 pistettä.
+            Kasvaessaan mato saa lisää värejä.
+        </p>
+
+        <p>
+            <strong>Helppo:</strong>
+            kenttä on 240 × 240 pikseliä.
+            Mato kasvaa joka toisesta hedelmästä.
+        </p>
+
+        <p>
+            <strong>Keskivaikea:</strong>
+            alkaa 2 520 pisteessä.
+            Kenttä kasvaa kokoon 360 × 360 pikseliä.
+            Mato nopeutuu ja kasvaa joka kolmannesta hedelmästä.
+        </p>
+
+        <p>
+            <strong>Vaikein:</strong>
+            alkaa 7 380 pisteessä.
+            Kenttä kasvaa kokoon 520 × 520 pikseliä.
+            Mato muuttuu erittäin nopeaksi
+            ja kasvaa joka viidennestä hedelmästä.
+        </p>
+
+        <p>
+            Taso vaihtuu, kun mato täyttää noin 90 %
+            nykyisen kentän ruuduista.
+            Mato ja pisteet säilyvät tasonvaihdossa.
+        </p>
+
+        <p>
+            Vaikeimmalla tasolla tavoitteena on täyttää koko kenttä.
+        </p>
+
+        <p>
+            Seinä- tai vartalotörmäys päättää pelin.
+            Et voi kääntyä suoraan vastakkaiseen suuntaan.
+        </p>
+
+        <p>
+            Escape palauttaa aloitusvalikkoon.
+            Jokainen uusi peli alkaa helpolta tasolta.
+        </p>
     </div>
 
     <script src="game.js"></script>
-
 </body>
 </html>
-
