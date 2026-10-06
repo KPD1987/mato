@@ -1,0 +1,7 @@
+Kaikki äänet ilmaiseksi Pixabaysta!
+All sounds for free from Pixabay!
+eat_SFX: Eating sound effect by freesound_community
+gameBG_music: Game Music Loop 6 by XtremeFreddy
+gameOver_SFX: Game Over by Alfix
+gameOverVoice_SFX: Game Over Deep Male Voice Clip by Universfield
+gameStart_SFX: Game Start by freesound_community
