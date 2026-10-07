@@ -18,7 +18,7 @@
             display: block;
             max-width: 100%;
             height: auto;
-            background: #17202b;
+            background: transparent;
             border: 2px solid #526176;
         }
 
@@ -46,6 +46,8 @@
             </select>
         </div>
 
+        <button id="secretButton" type="button" hidden>Kokeile salaista tasoa</button>
+
         <!-- Aloitusvalikko -->
         <div id="menu">
             <p>
@@ -63,11 +65,14 @@
         </div>
 
         <!-- Pelikenttä -->
+        <div id="canvasBackground">
+            <img id="backgroundImage" src="image/maze.jpg" alt="" aria-hidden="true">
         <canvas
             id="gameCanvas"
             width="240"
             height="240"
         ></canvas>
+        </div>
 
         <!-- Pelin lopetusnäyttö -->
         <div id="gameOverScreen" style="display: none;">
@@ -88,12 +93,54 @@
         <p><strong>Escape:</strong> palaa aloitusvalikkoon.</p>
 
         <p><strong>Vaikeustasot</strong></p>
-        <p><strong>Helppo:</strong> pieni kenttä ja perusnopea mato.</p>
+        <p><strong>Helppo:</strong> pieni kenttä ja rauhallinen nopeus.</p>
         <p><strong>Keskivaikea:</strong> suurempi kenttä ja nopeampi mato.</p>
         <p><strong>Vaikein:</strong> suurin kenttä ja erittäin nopea mato.</p>
         <p>Peli alkaa helpolta tasolta ja vaikeutuu automaattisesti.</p>
+
+        <div id="backgroundSettings">
+            <p><strong>Taustakuvan asetukset</strong></p>
+            <label for="backgroundBlur">Sumennus: <output id="blurValue" for="backgroundBlur">2 px</output></label>
+            <input id="backgroundBlur" type="range" min="0" max="20" step="1" value="2">
+        </div>
+
+        <p><label><input id="adminToggle" type="checkbox"> Admin: avaa kaikki tasot</label></p>
     </div>
 
+    <dialog id="secretChoice">
+        <p><strong>Salainen taso avattu!</strong></p>
+        <p>Kokeiletko uutta tasoa vai jatkatko nykyistä peliä?</p>
+        <button id="trySecretButton" type="button">Kokeile salaista tasoa</button>
+        <button id="continueButton" type="button">Jatka nykyistä peliä</button>
+    </dialog>
+
     <script src="game.js"></script>
+    <script>
+        const backgroundBlur = document.getElementById("backgroundBlur");
+        const blurValue = document.getElementById("blurValue");
+        const backgroundImage = document.getElementById("backgroundImage");
+
+        try {
+            const savedBlur = localStorage.getItem("matopeli-background-blur");
+            if (savedBlur !== null && Number.isFinite(Number(savedBlur))) {
+                backgroundBlur.value = Math.max(0, Math.min(20, Number(savedBlur)));
+            }
+        } catch (_) {}
+
+        function updateBackgroundBlur() {
+            const value = Number(backgroundBlur.value);
+            blurValue.textContent = `${value} px`;
+            backgroundImage.style.filter = `blur(${value}px)`;
+            // Kuvan reunoille jätetään tilaa sumennusta varten.
+            backgroundImage.style.inset = `${-value * 3}px`;
+            backgroundImage.style.width = `calc(100% + ${value * 6}px)`;
+            backgroundImage.style.height = `calc(100% + ${value * 6}px)`;
+            try { localStorage.setItem("matopeli-background-blur", String(value)); } catch (_) {}
+        }
+
+        backgroundBlur.addEventListener("input", updateBackgroundBlur);
+        backgroundImage.addEventListener("error", () => { backgroundImage.hidden = true; });
+        updateBackgroundBlur();
+    </script>
 </body>
 </html>
