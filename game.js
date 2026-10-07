@@ -10,8 +10,7 @@ const gameOverScreen = document.getElementById("gameOverScreen");
 const scoreDiv = document.getElementById("score");
 const scoreValueSpan = document.getElementById("scoreValue");
 const gameOverText = document.getElementById("gameOverText");
-const levelInfo = document.getElementById("levelInfo");
-const progressInfo = document.getElementById("progressInfo");
+const difficultySelect = document.getElementById("difficultySelect");
 
 // Pelin asetukset
 const cellSize = 20;
@@ -31,42 +30,48 @@ function calculateTargetLength(canvasSize) {
 const levels = [
     {
         label: "Helppo",
-        scoreLimit: 0,
         size: 240,
         speed: 250,
-        growthEvery: 2
+        growthEvery: 1
     },
     {
         label: "Keskivaikea",
-        scoreLimit: 0,
         size: 360,
         speed: 120,
-        growthEvery: 3
+        growthEvery: 2
     },
     {
-        label: "Vaikein",
-        scoreLimit: 0,
+        label: "Vaikea",
         size: 520,
-        speed: 30,
-        growthEvery: 5
+        speed: 70,
+        growthEvery: 3
     }
 ];
 
-// Lasketaan tasonvaihtojen pisteet.
-// Madon pituus ja pisteet säilyvät tasolta toiselle.
-let startingLength = initialSnakeLength;
+// Avatut tasot säilyvät selaimessa. Tallennuksen estyessä peli toimii silti.
+const unlockStorageKey = "matopeli-unlocked-level";
+let unlockedLevel = 0;
+try {
+    const saved = Number(localStorage.getItem(unlockStorageKey));
+    if (Number.isInteger(saved) && saved >= 0 && saved < levels.length) {
+        unlockedLevel = saved;
+    }
+} catch (_) {}
 
-for (let i = 0; i < levels.length - 1; i++) {
-    const level = levels[i];
-    const targetLength = calculateTargetLength(level.size);
+function updateDifficultySelect() {
+    for (let i = 0; i < difficultySelect.options.length; i++) {
+        const option = difficultySelect.options[i];
+        option.disabled = i > unlockedLevel;
+        option.textContent = levels[i].label + (option.disabled ? " (lukittu)" : "");
+    }
+}
 
-    const requiredGrowth = targetLength - startingLength;
-    const requiredFruits = requiredGrowth * level.growthEvery;
-
-    levels[i + 1].scoreLimit =
-        level.scoreLimit + requiredFruits * pointsPerFruit;
-
-    startingLength = targetLength;
+function unlockNextLevel() {
+    unlockedLevel = Math.max(unlockedLevel, currentLevel + 1);
+    try {
+        localStorage.setItem(unlockStorageKey, String(unlockedLevel));
+    } catch (_) {}
+    updateDifficultySelect();
 }
 
 // Pelin muuttujat
@@ -123,38 +128,6 @@ function stopTimers() {
     music.pause();
 }
 
-// Päivitetään tason ja etenemisen tiedot
-function updateLevelInfo() {
-    const level = levels[currentLevel];
-    const totalCells = boardSize * boardSize;
-    const filledPercent = (
-        snake.length / totalCells * 100
-    ).toFixed(1);
-
-    levelInfo.textContent =
-        `Taso: ${level.label} · ${width} × ${height} px`;
-
-    if (currentLevel < levels.length - 1) {
-        const nextLevel = levels[currentLevel + 1];
-        const remainingPoints = Math.max(
-            0,
-            nextLevel.scoreLimit - score
-        );
-
-        progressInfo.textContent =
-            `Pituus: ${snake.length}/${totalCells} ruutua ` +
-            `(${filledPercent} %) · ` +
-            `Kasvu joka ${level.growthEvery}. hedelmä · ` +
-            `Seuraavaan tasoon ${remainingPoints} pistettä`;
-    } else {
-        progressInfo.textContent =
-            `Pituus: ${snake.length}/${totalCells} ruutua ` +
-            `(${filledPercent} %) · ` +
-            `Kasvu joka ${level.growthEvery}. hedelmä · ` +
-            `Täytä koko kenttä voittaaksesi!`;
-    }
-}
-
 // Muutetaan kentän kokoa ja nopeutta.
 // Madon ja hedelmän koordinaatit säilyvät.
 function setLevel(levelIndex) {
@@ -171,25 +144,23 @@ function setLevel(levelIndex) {
     boardSize = width / cellSize;
     snake.speed = level.speed;
 
-    updateLevelInfo();
 
     if (gameRunning) {
         resetTimer();
     }
 }
 
-// Tarkistetaan pisteistä seuraava vaikeustaso
+// Jokainen taso läpäistään samalla kentän kokoon suhteutetulla pituudella.
 function checkDifficulty() {
-    let nextLevel = 0;
+    if (snake.length < calculateTargetLength(levels[currentLevel].size)) return;
 
-    for (let i = 0; i < levels.length; i++) {
-        if (score >= levels[i].scoreLimit) {
-            nextLevel = i;
-        }
-    }
-
-    if (nextLevel !== currentLevel) {
-        setLevel(nextLevel);
+    if (currentLevel < levels.length - 1) {
+        unlockNextLevel();
+        snake.fruits = 0;
+        setLevel(currentLevel + 1);
+        difficultySelect.value = String(currentLevel);
+    } else {
+        endGame("Voitit! Läpäisit vaikean tason.");
     }
 }
 
@@ -208,7 +179,8 @@ function returnToMenu() {
 
     scoreValueSpan.textContent = score;
 
-    setLevel(0);
+    setLevel(Number(difficultySelect.value));
+    difficultySelect.disabled = false;
 
     menu.style.display = "block";
     gameOverScreen.style.display = "none";
@@ -225,7 +197,7 @@ document.addEventListener("keydown", (e) => {
     }
 
     // Painikkeet käsittelevät Enterin itse
-    if (e.target.tagName === "BUTTON") return;
+    if (["BUTTON", "SELECT", "OPTION"].includes(e.target.tagName)) return;
 
     if (e.key === "Enter" && !gameRunning) {
         e.preventDefault();
@@ -290,8 +262,11 @@ function startGame() {
 
     nextDirection = null;
 
-    // Jokainen uusi peli alkaa helpolta tasolta
-    setLevel(0);
+    // Aloitetaan valitulta, avatulta tasolta.
+    const selectedLevel = Number(difficultySelect.value);
+    setLevel(Number.isInteger(selectedLevel) && selectedLevel >= 0 &&
+        selectedLevel <= unlockedLevel ? selectedLevel : 0);
+    difficultySelect.disabled = true;
 
     snake.xPos = Math.floor(boardSize / 2);
     snake.yPos = Math.floor(boardSize / 2);
@@ -315,7 +290,6 @@ function startGame() {
 
     gameRunning = true;
 
-    updateLevelInfo();
     drawGame();
     resetTimer();
 
@@ -405,17 +379,17 @@ function movement() {
         snake.body.pop();
     }
 
-    // Uusi hedelmä päivitetyn vartalon ja kentän mukaan
+    // Tasonvaihto tehdään vasta, kun vartalo on päivitetty.
     if (eating) {
-        spawnFruit();
+        checkDifficulty();
+        if (gameRunning) spawnFruit();
     }
 
     scoreValueSpan.textContent = score;
 
-    updateLevelInfo();
     drawGame();
 
-    if (fruit === null) {
+    if (gameRunning && fruit === null) {
         endGame("Voitit! Täytit koko kentän.");
     }
 }
@@ -469,8 +443,6 @@ function checkStatChange() {
         snake.fruits = 0;
     }
 
-    // Tasonvaihto tarkistetaan kasvamisen jälkeen
-    checkDifficulty();
 }
 
 // Hedelmän sijoittaminen vapaaseen ruutuun
@@ -748,6 +720,7 @@ function drawFruit() {
 function endGame(message) {
     stopTimers();
     gameRunning = false;
+    difficultySelect.disabled = false;
 
     gameOverText.textContent = message;
     gameOverScreen.style.display = "block";
@@ -770,5 +743,17 @@ restartButton.addEventListener("click", () => {
     startGame();
 });
 
-// Alustetaan ensimmäinen taso
+// Valinta päivittää kentän esikatselun ennen seuraavaa peliä.
+difficultySelect.addEventListener("change", () => {
+    if (gameRunning) return;
+    const selectedLevel = Number(difficultySelect.value);
+    if (!Number.isInteger(selectedLevel) || selectedLevel < 0 || selectedLevel > unlockedLevel) {
+        difficultySelect.value = String(currentLevel);
+        return;
+    }
+    setLevel(selectedLevel);
+    ctx.clearRect(0, 0, width, height);
+});
+
+updateDifficultySelect();
 setLevel(0);
