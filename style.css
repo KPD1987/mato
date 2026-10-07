@@ -71,3 +71,52 @@
             font-size: 14px;
             line-height: 1.4;
         }
+
+/* Vaikeustason valinta käyttää pelin nykyistä värimaailmaa. */
+#difficultyPicker {
+    margin: 12px 0;
+}
+
+#difficultySelect {
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#difficultySelect:disabled {
+    background: #ccc;
+    cursor: default;
+}
+
+/* Tason "Puro" valinta säilyttää mustavalkoisen käyttöliittymän. */
+#secretChoice { background: #000; color: #fff; border: 2px solid #fff; max-width: 360px; }
+#secretChoice::backdrop { background: rgba(0, 0, 0, 0.65); }
+#adminToggle { accent-color: #fff; }
+
+
+/* Taustakuva on omalla kerroksellaan: sumennus ei vaikuta peliin. */
+#canvasBackground {
+    position: relative;
+    overflow: hidden;
+    background: #17202b;
+    margin-top: 20px;
+    max-width: 100%;
+}
+#backgroundImage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+}
+#canvasBackground #gameCanvas {
+    position: relative;
+    margin-top: 0;
+}
+#backgroundSettings { margin-top: 20px; }
+#backgroundBlur { display: block; width: 100%; margin: 10px 0; accent-color: #fff; }
